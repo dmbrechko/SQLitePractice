@@ -2,7 +2,7 @@
     <string name="app_name">SQLitePractice</string>
     <string name="product_shop">Product shop</string>
     <string name="enter_name">Enter name</string>
-    <string name="enter_amount">Enter amount</string>
+    <string name="enter_amount">Enter weight</string>
     <string name="enter_price">Enter price</string>
     <string name="save">Save</string>
     <string name="product_name">Product name: %s</string>
@@ -12,4 +12,8 @@
     <string name="fill_all_fields">Fill all fields</string>
     <string name="enter_valid_amount_and_price">Enter valid weight and price</string>
     <string name="exit">Exit</string>
+    <string name="edit_record">Edit record</string>
+    <string name="enter_data_below">Enter data below</string>
+    <string name="update">Update</string>
+    <string name="record_updated">Record updated</string>
 </resources>

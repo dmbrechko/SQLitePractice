@@ -36,20 +36,37 @@ class DBHelper (context: Context, factory: SQLiteDatabase.CursorFactory?):
         db.close()
     }
 
+    fun updateOperation(operation: Operation) {
+        val values = ContentValues()
+        values.put(KEY_NAME, operation.name)
+        values.put(KEY_WEIGHT, operation.weight)
+        values.put(KEY_PRICE, operation.price)
+        val db = this.writableDatabase
+        db.update(TABLE_NAME, values, "$KEY_ID = ?", arrayOf(operation.id.toString()))
+        db.close()
+    }
+
+    fun deleteOperation(operation: Operation) {
+        val db = this.writableDatabase
+        db.delete(TABLE_NAME, "$KEY_ID = ?", arrayOf(operation.id.toString()))
+    }
+
     fun getInfo(onError: () -> Unit): MutableList<Operation> {
         val list = mutableListOf<Operation>()
         val db = this.readableDatabase
         val cursor = db.rawQuery("SELECT * FROM $TABLE_NAME", null)
         try {
             if (cursor.moveToFirst()) {
+                val idIndex = cursor.getColumnIndexOrThrow(KEY_ID)
                 val nameIndex = cursor.getColumnIndexOrThrow(KEY_NAME)
                 val amountIndex = cursor.getColumnIndexOrThrow(KEY_WEIGHT)
                 val priceIndex = cursor.getColumnIndexOrThrow(KEY_PRICE)
                 do {
+                    val id = cursor.getInt(idIndex)
                     val name = cursor.getString(nameIndex)
                     val amount = cursor.getInt(amountIndex)
                     val price = cursor.getInt(priceIndex)
-                    val operation = Operation(name, amount, price)
+                    val operation = Operation(id, name, amount, price)
                     list.add(operation)
                 } while (cursor.moveToNext())
             }
@@ -70,4 +87,4 @@ class DBHelper (context: Context, factory: SQLiteDatabase.CursorFactory?):
     }
 }
 
-data class Operation(val name: String, val weight: Int, val price: Int)
+data class Operation(val id: Int = 0, val name: String, val weight: Int, val price: Int)

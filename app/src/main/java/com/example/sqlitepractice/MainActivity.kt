@@ -11,11 +11,13 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.sqlitepractice.databinding.ActivityMainBinding
+import com.example.sqlitepractice.databinding.DialogLayoutBinding
 import com.example.sqlitepractice.databinding.ListItemBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -52,6 +54,12 @@ class MainActivity : AppCompatActivity() {
                         amountTV.text = String.format(getString(R.string.weight), operation.weight.toString())
                         priceTV.text = String.format(getString(R.string.price), operation.price.toString())
                     }
+                    deleteIV.setOnClickListener {
+                        deleteItem(position)
+                    }
+                    editIV.setOnClickListener {
+                        updateItem(position)
+                    }
                 }
                 return view
             }
@@ -69,9 +77,9 @@ class MainActivity : AppCompatActivity() {
                 }
                 val operation = try {
                     val name = nameET.text.toString()
-                    val amount = amountET.text.toString().toInt()
+                    val weight = amountET.text.toString().toInt()
                     val price = priceET.text.toString().toInt()
-                    Operation(name, amount, price)
+                    Operation(name = name, weight = weight, price = price)
                 } catch (e: NumberFormatException) {
                     makeToast(R.string.enter_valid_amount_and_price)
                     return@setOnClickListener
@@ -103,6 +111,58 @@ class MainActivity : AppCompatActivity() {
         operations.addAll(list)
         adapter.notifyDataSetChanged()
     }
+
+    private fun deleteItem(position: Int) {
+        val operation = operations[position]
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                db.deleteOperation(operation)
+            }
+            loadAndSetList()
+        }
+    }
+
+    private fun updateItem(position: Int) {
+        val operation = operations[position]
+        val dialogBuilder = AlertDialog.Builder(this)
+        val dialogBinding = DialogLayoutBinding.inflate(layoutInflater)
+        dialogBinding.apply {
+            nameET.setText(operation.name)
+            amountET.setText(operation.weight.toString())
+            priceET.setText(operation.price.toString())
+        }
+        dialogBuilder.setView(dialogBinding.root)
+            .setTitle(getString(R.string.edit_record))
+            .setMessage(getString(R.string.enter_data_below))
+            .setPositiveButton (getString(R.string.update)) { _, _ ->
+                dialogBinding.apply {
+                    if (nameET.text.isBlank() || amountET.text.isBlank() || priceET.text.isBlank()) {
+                        makeToast(R.string.fill_all_fields)
+                        return@setPositiveButton
+                    }
+                    try {
+                        val name = nameET.text.toString().trim()
+                        val weight = amountET.text.toString().trim().toInt()
+                        val price = priceET.text.toString().trim().toInt()
+                        val updatedOperation = operation.copy(name = name, weight = weight, price = price)
+                        lifecycleScope.launch {
+                            withContext(Dispatchers.IO) {
+                                db.updateOperation(updatedOperation)
+                            }
+                            loadAndSetList()
+                            makeToast(R.string.record_updated)
+                        }
+                    } catch (e: NumberFormatException) {
+                        makeToast(R.string.enter_valid_amount_and_price)
+                        return@setPositiveButton
+                    }
+                }
+            }
+            .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
+            .create()
+            .show()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_exit, menu)
         return true
