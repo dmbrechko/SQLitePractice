@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">SQLitePractice</string>
+    <string name="product_shop">Product shop</string>
+    <string name="enter_name">Enter name</string>
+    <string name="enter_amount">Enter amount</string>
+    <string name="enter_price">Enter price</string>
+    <string name="save">Save</string>
+    <string name="product_name">Product name: %s</string>
+    <string name="weight">Weight: %s</string>
+    <string name="price">Price: %s</string>
+    <string name="error_loading">Error loading</string>
+    <string name="fill_all_fields">Fill all fields</string>
+    <string name="enter_valid_amount_and_price">Enter valid weight and price</string>
+    <string name="exit">Exit</string>
+</resources>
