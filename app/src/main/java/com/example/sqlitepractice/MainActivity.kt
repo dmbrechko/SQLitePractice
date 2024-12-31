@@ -82,6 +82,9 @@ class MainActivity : AppCompatActivity() {
                     }
                     loadAndSetList()
                 }
+                nameET.text.clear()
+                amountET.text.clear()
+                priceET.text.clear()
             }
         }
     }
